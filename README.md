@@ -162,3 +162,16 @@ Screenshots & demo video
 Resume bullet points
 
 📌 Outcome: Placement-ready project
+
+
+Backend: C++ (Drogon)
+
+Database: MySQL
+
+Frontend: React Native
+
+Auth: JWT
+
+API format: JSON
+
+Architecture: Client–Server
