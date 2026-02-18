@@ -1,0 +1,11 @@
+build/
+*.exe
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.user
+CMakeFiles/
+CMakeCache.txt
+Debug/
+Release/
+x64/

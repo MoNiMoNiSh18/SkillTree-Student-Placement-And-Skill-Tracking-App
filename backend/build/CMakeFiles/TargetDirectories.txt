@@ -1,0 +1,3 @@
+C:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend/build/CMakeFiles/skilltree_backend.dir
+C:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend/build/CMakeFiles/ZERO_CHECK.dir

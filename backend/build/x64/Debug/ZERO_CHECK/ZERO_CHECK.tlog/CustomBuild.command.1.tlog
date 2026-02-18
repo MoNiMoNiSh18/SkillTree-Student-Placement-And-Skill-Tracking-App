@@ -1,0 +1,10 @@
+^C:\USERS\VUMA FAMILY\ONEDRIVE\DESKTOP\SKILLTREE\BACKEND\BUILD\CMAKEFILES\B05FEF3FA26B6FC0BE094A332F570BE4\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend" "-BC:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/VUMA Family/OneDrive/Desktop/SkillTree/backend/build/SkillTree_Backend.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
