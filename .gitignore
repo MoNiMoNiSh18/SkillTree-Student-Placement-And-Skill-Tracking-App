@@ -4,6 +4,10 @@ build/
 *.vcxproj.filters
 *.sln
 *.user
+*.o
+*.out
+*.dll
+*.log
 CMakeFiles/
 CMakeCache.txt
 Debug/
