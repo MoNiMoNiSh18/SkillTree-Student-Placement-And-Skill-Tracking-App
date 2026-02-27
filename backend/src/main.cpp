@@ -2,6 +2,7 @@
 #include <vector>
 #include "httplib.h"
 #include "json.hpp"
+#include <algorithm>
 using json=nlohmann::json;
 
 struct Student{
@@ -57,8 +58,84 @@ int main() {
     }
 });
 
+   server.Delete(R"(/students/(\d+))", [](const httplib::Request& req, httplib::Response& res) {
+    try {
+        if (req.matches.size() < 2) {
+            res.status = 400;
+            res.set_content("{\"error\": \"Invalid ID\"}", "application/json");
+            return;
+        }
 
-    std::cout << "Server running at http://localhost:8080\n";
-    server.listen("0.0.0.0", 8080);
+        int id = std::stoi(req.matches[1]);
+
+        auto it = std::remove_if(students.begin(), students.end(),
+            [id](const Student& s) {
+                return s.id == id;
+            });
+
+        if (it != students.end()) {
+            students.erase(it, students.end());
+            res.set_content("{\"message\": \"Student deleted\"}", "application/json");
+        } else {
+            res.status = 404;
+            res.set_content("{\"error\": \"Student not found\"}", "application/json");
+        }
+    }
+    catch (...) {
+        res.status = 400;
+        res.set_content("{\"error\": \"Invalid request\"}", "application/json");
+    }
+});
+
+server.Put(R"(/students/(\d+))", [](const httplib::Request& req, httplib::Response& res) {
+    try {
+        if (req.matches.size() < 2) {
+            res.status = 400;
+            res.set_content("{\"error\":\"Invalid ID\"}", "application/json");
+            return;
+        }
+
+        int id = std::stoi(req.matches[1]);
+        auto body = json::parse(req.body);
+
+        for (auto& s : students) {
+            if (s.id == id) {
+
+                // Validation
+                if (!body.contains("name") || !body.contains("skill_level")) {
+                    res.status = 400;
+                    res.set_content("{\"error\":\"Missing fields\"}", "application/json");
+                    return;
+                }
+
+                if (body["name"].get<std::string>().empty() ||
+                    body["skill_level"].get<int>() < 0) {
+                    res.status = 400;
+                    res.set_content("{\"error\":\"Invalid data\"}", "application/json");
+                    return;
+                }
+
+                s.name = body["name"];
+                s.skill_level = body["skill_level"];
+
+                res.set_content("{\"message\":\"Student updated\"}", "application/json");
+                return;
+            }
+        }
+
+        res.status = 404;
+        res.set_content("{\"error\":\"Student not found\"}", "application/json");
+    }
+    catch (...) {
+        res.status = 400;
+        res.set_content("{\"error\":\"Invalid JSON\"}", "application/json");
+    }
+});
+
+
+    std::cout << "Server running at http://localhost:9090\n";
+    if (!server.listen("0.0.0.0", 9090)) {
+    std::cerr << "Failed to start server on port 9090\n";
+}
     return 0;
 }
