@@ -18,6 +18,10 @@ const skillRoutes = require("./routes/skillRoutes");
 
 app.use("/api/skills", skillRoutes);
 
+const companyRoutes = require("./routes/companyRoutes");
+
+app.use("/api/companies", companyRoutes);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
