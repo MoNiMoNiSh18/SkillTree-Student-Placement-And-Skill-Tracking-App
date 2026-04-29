@@ -18,7 +18,7 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/applications", applicationRoutes);
 
 app.get("/", (req, res) => {
-    res.send("SkillTrack API Running...");
+    res.send("SkillTree API Running...");
 });
 
 const PORT = process.env.PORT || 5000;

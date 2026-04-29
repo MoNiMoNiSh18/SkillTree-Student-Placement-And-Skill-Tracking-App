@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "SkillTrack Backend",
+  "description": "SkillTree Backend",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
