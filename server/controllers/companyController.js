@@ -49,3 +49,18 @@ exports.checkEligibility = (req, res) => {
         res.json(results);
     });
 };
+
+exports.dashboardStats = (req, res) => {
+    const query = `
+        SELECT 
+            (SELECT COUNT(*) FROM students) AS total_students,
+            (SELECT COUNT(*) FROM companies) AS total_companies,
+            (SELECT COUNT(*) FROM applications) AS total_applications
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).json(err);
+
+        res.json(results[0]);
+    });
+};
