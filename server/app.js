@@ -22,6 +22,10 @@ const companyRoutes = require("./routes/companyRoutes");
 
 app.use("/api/companies", companyRoutes);
 
+const applicationRoutes = require("./routes/applicationRoutes");
+
+app.use("/api/applications", applicationRoutes);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
