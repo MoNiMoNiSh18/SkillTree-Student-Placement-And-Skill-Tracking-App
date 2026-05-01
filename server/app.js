@@ -11,7 +11,9 @@ const authRoutes = require("./routes/authRoutes");
 const skillRoutes = require("./routes/skillRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
+app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/companies", companyRoutes);
