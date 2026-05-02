@@ -1,40 +1,59 @@
 const fs = require("fs");
-const pdf = require("pdf-parse");
 const db = require("../config/db");
 
 const SKILLS = ["DSA", "Java", "Python", "React", "Node", "SQL"];
 
 exports.uploadResume = async (req, res) => {
     try {
+        console.log("File received:", req.file);
+
         const filePath = req.file.path;
+        const fileType = req.file.mimetype;
 
-        const dataBuffer = fs.readFileSync(filePath);
-        const data = await pdf(dataBuffer);
+        let text = "";
 
-        const text = data.text.toLowerCase();
+        // 🔥 HANDLE TEXT FILE (RELIABLE)
+        if (fileType === "text/plain") {
+            text = fs.readFileSync(filePath, "utf-8");
+        } 
+        else {
+            // ❌ PDF fallback (skip parsing)
+            return res.status(400).json({
+                message: "PDF parsing unstable in this version. Please upload .txt file for demo."
+            });
+        }
+
+        console.log("RAW TEXT:", text);
+
+        // Clean text
+        text = text
+            .replace(/\s+/g, " ")
+            .toLowerCase();
+
+        console.log("CLEAN TEXT:", text);
 
         const detectedSkills = SKILLS.filter(skill =>
             text.includes(skill.toLowerCase())
         );
 
+        console.log("Detected skills:", detectedSkills);
+
         const student_id = req.body.student_id;
 
-        detectedSkills.forEach(skill => {
-            const query = `
-                INSERT INTO student_skills (student_id, skill_id, level)
-                SELECT ?, id, 'intermediate'
-                FROM skills 
-                WHERE name = ?
-                AND NOT EXISTS (
-                    SELECT 1 FROM student_skills 
-                    WHERE student_id = ? 
-                    AND skill_id = skills.id
-                )
-            `;
-            db.query(query, [student_id, skill, student_id]);
-        });
-
-        fs.unlinkSync(filePath);
+        for (let skill of detectedSkills) {
+        const query = `
+            INSERT INTO student_skills (student_id, skill_id, level)
+            SELECT ?, id, 'intermediate'
+            FROM skills 
+            WHERE name = ?
+            AND NOT EXISTS (
+                SELECT 1 FROM student_skills 
+                WHERE student_id = ? 
+                AND skill_id = skills.id
+            )
+        `;            
+        db.query(query, [student_id, skill]);
+        }
 
         res.json({
             message: "Resume analyzed",
@@ -42,11 +61,11 @@ exports.uploadResume = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json(err);
+        console.error("ERROR:", err);
+        res.status(500).json({ error: "Server error" });
     }
 };
 
-// Chatbot (local AI)
 exports.chatbot = (req, res) => {
     const { message, student_id } = req.body;
 
@@ -62,8 +81,9 @@ exports.chatbot = (req, res) => {
         if (err) return res.status(500).json(err);
 
         const student = results[0];
-        const skills = student.skills ? student.skills.split(",") : [];
-
+        const skills = student.skills
+        ? [...new Set(student.skills.split(","))]
+        : [];
         let reply = "";
 
         if (message.toLowerCase().includes("eligible")) {
