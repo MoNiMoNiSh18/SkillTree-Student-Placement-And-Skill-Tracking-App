@@ -27,7 +27,12 @@ exports.register = (req, res) => {
 exports.login = (req, res) => {
     const { email, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE email = ?";
+    const sql = `
+    SELECT u.id as user_id, s.id as student_id, u.password
+    FROM users u
+    JOIN students s ON u.id = s.user_id
+    WHERE u.email = ?
+`;
     db.query(sql, [email], (err, results) => {
         if (err) return res.status(500).json(err);
 
@@ -44,14 +49,15 @@ exports.login = (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id },
+            { id: user.user_id },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
 
         res.json({
             message: "Login successful",
-            token
+            token,
+            student_id: user.student_id
         });
     });
 };

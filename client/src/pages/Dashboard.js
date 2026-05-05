@@ -1,26 +1,32 @@
+import { useEffect, useState } from "react";
+import API from "../services/api";
 import Chatbot from "../components/Chatbot";
-import ResumeUpload from "../components/ResumeUpload";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
+  const [skills, setSkills] = useState([]);
+
+  const student_id = localStorage.getItem("student_id");
+
+  useEffect(() => {
+    API.get(`/skills/${student_id}`)
+      .then(res => setSkills(res.data));
+  }, []);
+
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">SkillTree Dashboard</h2>
+    <div style={{ padding: "20px" }}>
+      <h2>Dashboard</h2>
 
-      <div className="row">
-        {/* Resume Section */}
-        <div className="col-md-6">
-          <div className="card shadow p-3">
-            <ResumeUpload />
-          </div>
-        </div>
-
-        {/* Chatbot Section */}
-        <div className="col-md-6">
-          <div className="card shadow p-3">
-            <Chatbot />
-          </div>
-        </div>
-      </div>
+      <h3>Your Skills:</h3>
+      <ul>
+        {[...new Map(skills.map(s => [s.name, s])).values()].map((s, i) => (
+  <li key={i}>{s.name}</li>
+))}
+      </ul>
+        <Link to="/resume">Upload Resume</Link>
+        <br />
+        <Link to="/companies">View Companies</Link>
+      <Chatbot />
     </div>
   );
 }

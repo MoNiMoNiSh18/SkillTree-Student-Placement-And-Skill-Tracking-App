@@ -1,48 +1,47 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const login = async () => {
+  const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await API.post("/auth/login", {
         email,
-        password,
+        password
       });
 
-      localStorage.setItem("token", res.data.token);
-      alert("Login successful");
-
-      window.location.href = "/dashboard";
-    } catch {
+      localStorage.setItem("student_id", res.data.student_id);
+      navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
       alert("Login failed");
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4 shadow" style={{ width: "300px" }}>
-        <h4 className="text-center mb-3">Login</h4>
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      <h2>SkillTree Login</h2>
 
-        <input
-          className="form-control mb-2"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <input
+        placeholder="Enter Email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <input
-          type="password"
-          className="form-control mb-3"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <br /><br />
 
-        <button className="btn btn-primary w-100" onClick={login}>
-          Login
-        </button>
-      </div>
+      <input
+        type="password"
+        placeholder="Enter Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <br /><br />
+
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 }

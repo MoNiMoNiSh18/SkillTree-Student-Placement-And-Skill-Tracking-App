@@ -12,12 +12,10 @@ exports.uploadResume = async (req, res) => {
 
         let text = "";
 
-        // 🔥 HANDLE TEXT FILE (RELIABLE)
         if (fileType === "text/plain") {
             text = fs.readFileSync(filePath, "utf-8");
         } 
         else {
-            // ❌ PDF fallback (skip parsing)
             return res.status(400).json({
                 message: "PDF parsing unstable in this version. Please upload .txt file for demo."
             });
@@ -25,7 +23,6 @@ exports.uploadResume = async (req, res) => {
 
         console.log("RAW TEXT:", text);
 
-        // Clean text
         text = text
             .replace(/\s+/g, " ")
             .toLowerCase();
@@ -39,7 +36,12 @@ exports.uploadResume = async (req, res) => {
         console.log("Detected skills:", detectedSkills);
 
         const student_id = req.body.student_id;
+        console.log("BODY:", req.body);
+        console.log("Student ID:", student_id);
 
+        if (!student_id) {
+            return res.status(400).json({ error: "Student ID missing" });
+        }
         for (let skill of detectedSkills) {
         const query = `
             INSERT INTO student_skills (student_id, skill_id, level)
@@ -52,7 +54,7 @@ exports.uploadResume = async (req, res) => {
                 AND skill_id = skills.id
             )
         `;            
-        db.query(query, [student_id, skill]);
+       db.query(query, [student_id, skill, student_id]);
         }
 
         res.json({

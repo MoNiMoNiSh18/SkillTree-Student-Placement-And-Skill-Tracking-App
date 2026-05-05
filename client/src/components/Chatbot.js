@@ -1,49 +1,42 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 
 function Chatbot() {
   const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]);
+  const [reply, setReply] = useState("");
 
-  const send = async () => {
-    const res = await axios.post("http://localhost:5000/api/ai/chat", {
-      student_id: 1,
+  const student_id = localStorage.getItem("student_id");
+
+  const sendMessage = async () => {
+  try {
+    const student_id = localStorage.getItem("student_id");
+
+    const res = await API.post("/ai/chat", {
       message,
+      student_id
     });
 
-    setChat([...chat, { user: message, bot: res.data.reply }]);
-    setMessage("");
-  };
+    setReply(res.data.reply);
+  } catch (err) {
+    console.error(err);
+    alert("Chat failed");
+  }
+};
 
   return (
-  <div>
-    <h5 className="mb-3">AI Assistant</h5>
+    <div style={{ marginTop: "30px" }}>
+      <h3>Assistant</h3>
 
-    <div
-      className="border p-3 mb-3"
-      style={{ height: "300px", overflowY: "auto", background: "#f8f9fa" }}
-    >
-      {chat.map((c, i) => (
-        <div key={i}>
-          <p><b>You:</b> {c.user}</p>
-          <p className="text-success"><b>Bot:</b> {c.bot}</p>
-          <hr />
-        </div>
-      ))}
-    </div>
-
-    <div className="input-group">
       <input
-        className="form-control"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
         placeholder="Ask something..."
+        onChange={(e) => setMessage(e.target.value)}
       />
-      <button className="btn btn-primary" onClick={send}>
-        Send
-      </button>
+
+      <button onClick={sendMessage}>Send</button>
+
+      <p><b>Bot:</b> {reply}</p>
     </div>
-  </div>
-);
+  );
 }
+
 export default Chatbot;

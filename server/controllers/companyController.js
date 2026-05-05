@@ -26,24 +26,31 @@ exports.checkEligibility = (req, res) => {
     const { student_id } = req.params;
 
     const query = `
-        SELECT c.name, c.min_cgpa, c.required_skill,
-               s.cgpa,
-               CASE 
-                   WHEN s.cgpa >= c.min_cgpa 
-                   AND EXISTS (
-                       SELECT 1 FROM student_skills ss
-                       JOIN skills sk ON ss.skill_id = sk.id
-                       WHERE ss.student_id = s.id
-                       AND sk.name = c.required_skill
-                   )
-                   THEN 'Eligible'
-                   ELSE 'Not Eligible'
-               END AS status
+        SELECT 
+            c.id,
+            c.name,
+            c.min_cgpa,
+            c.required_skill,
+            (
+                SELECT cgpa FROM students WHERE id = ?
+            ) AS cgpa,
+            CASE 
+                WHEN (
+                    SELECT cgpa FROM students WHERE id = ?
+                ) >= c.min_cgpa
+                AND c.required_skill IN (
+                    SELECT sk.name 
+                    FROM student_skills ss
+                    JOIN skills sk ON ss.skill_id = sk.id
+                    WHERE ss.student_id = ?
+                )
+                THEN 'Eligible'
+                ELSE 'Not Eligible'
+            END AS status
         FROM companies c
-        JOIN students s ON s.id = ?
     `;
 
-    db.query(query, [student_id], (err, results) => {
+    db.query(query, [student_id, student_id, student_id], (err, results) => {
         if (err) return res.status(500).json(err);
 
         res.json(results);
